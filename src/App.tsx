@@ -54,10 +54,33 @@ function App() {
     const parent = chapters.find((item) => item.id !== 'observe' && articles[item.id].some((candidate) => candidate.id === entry.id))
     if (parent) setChapter(parent.id)
     setArticle(entry)
+    window.history.pushState({ articleId: entry.id }, '', `?article=${encodeURIComponent(entry.id)}`)
     window.scrollTo(0, 0)
   }
   const returnToWorld = useCallback(() => { window.history.back() }, [])
   const isLayerOpen = moonOpen
+  useEffect(() => {
+    const findArticle = (id: string | null) => id ? Object.values(articles).flat().find((item) => item.id === id) ?? null : null
+    const initialId = new URLSearchParams(window.location.search).get('article')
+    const initialArticle = findArticle(initialId)
+    if (initialArticle) {
+      window.history.replaceState({ articleId: null }, '', window.location.pathname)
+      window.history.pushState({ articleId: initialArticle.id }, '', `?article=${encodeURIComponent(initialArticle.id)}`)
+      setArticle(initialArticle)
+      const parent = chapters.find((item) => item.id !== 'observe' && articles[item.id].some((entry) => entry.id === initialArticle.id))
+      if (parent) setChapter(parent.id)
+    }
+    const onPopState = () => {
+      const next = findArticle(new URLSearchParams(window.location.search).get('article'))
+      setArticle(next)
+      if (next) {
+        const parent = chapters.find((item) => item.id !== 'observe' && articles[item.id].some((entry) => entry.id === next.id))
+        if (parent) setChapter(parent.id)
+      }
+    }
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+  }, [])
   useEffect(() => {
     if (!isLayerOpen) return
     const previousOverflow = document.body.style.overflow

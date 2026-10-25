@@ -22,6 +22,12 @@ function App() {
   const returnFocus = useRef<HTMLElement | null>(null)
   const active = chapters.find((item) => item.id === chapter)!
   const observation = observations.find((item) => item.id === selected)
+  const articleChapter = article ? chapters.find((item) => item.id !== 'observe' && articles[item.id].some((entry) => entry.id === article.id)) ?? null : null
+  const articleEntries = articleChapter ? articles[articleChapter.id as 'connect' | 'reflect'] : []
+  const articleIndex = article ? articleEntries.findIndex((entry) => entry.id === article.id) : -1
+  const previousArticle = articleIndex > 0 ? articleEntries[articleIndex - 1] : null
+  const nextArticle = articleIndex >= 0 && articleIndex < articleEntries.length - 1 ? articleEntries[articleIndex + 1] : null
+  const articleChapterTitle = articleChapter?.title ?? 'CHAPTER'
 
   const changeChapter = useCallback((next: Chapter) => setChapter(next), [])
   const step = useCallback((direction: number) => {
@@ -65,7 +71,13 @@ function App() {
     window.history.pushState({ articleId: entry.id }, '', `?article=${encodeURIComponent(entry.id)}`)
     window.scrollTo(0, 0)
   }
-  const returnToWorld = useCallback(() => { window.history.back() }, [])
+  const returnToList = useCallback(() => {
+    const targetChapter = articleChapter?.id ?? chapter
+    window.history.pushState({ articleId: null, chapter: targetChapter }, '', `?chapter=${targetChapter}`)
+    setArticle(null)
+    setChapter(targetChapter)
+    window.scrollTo(0, 0)
+  }, [articleChapter, chapter])
   const isLayerOpen = moonOpen
   useEffect(() => {
     const findArticle = (id: string | null) => id ? Object.values(articles).flat().find((item) => item.id === id) ?? null : null
@@ -77,13 +89,20 @@ function App() {
       setArticle(initialArticle)
       const parent = chapters.find((item) => item.id !== 'observe' && articles[item.id].some((entry) => entry.id === initialArticle.id))
       if (parent) setChapter(parent.id)
+    } else {
+      const initialChapter = new URLSearchParams(window.location.search).get('chapter')
+      if (initialChapter === 'connect' || initialChapter === 'reflect') setChapter(initialChapter)
     }
     const onPopState = () => {
-      const next = findArticle(new URLSearchParams(window.location.search).get('article'))
+      const params = new URLSearchParams(window.location.search)
+      const next = findArticle(params.get('article'))
       setArticle(next)
       if (next) {
         const parent = chapters.find((item) => item.id !== 'observe' && articles[item.id].some((entry) => entry.id === next.id))
         if (parent) setChapter(parent.id)
+      } else {
+        const targetChapter = params.get('chapter')
+        if (targetChapter === 'connect' || targetChapter === 'reflect') setChapter(targetChapter)
       }
     }
     window.addEventListener('popstate', onPopState)
@@ -121,9 +140,15 @@ function App() {
   }, [article])
 
   if (article) return <main className="reader-page">
-    <header className="topbar"><a className="brand" href="/" onClick={(event) => { event.preventDefault(); returnToWorld() }}>my little world<span>.</span></a><span className="top-note">A PERSONAL UNIVERSE</span></header>
-    <button className="back-button reader-back" onClick={returnToWorld}>← BACK TO MY WORLD</button>
-    <article className="reader-content reader-page-content"><div className="reader-category">{article.category} <span>· {article.date}</span></div><h1>{article.title}</h1><p className="reader-subtitle">{article.subtitle}</p><div className="reader-rule" />{article.body.map((paragraph, index) => <p key={index}>{paragraph}</p>)}{article.quote && <blockquote>{article.quote}</blockquote>}<p className="reader-demo">DEMO ARTICLE · 실제 글이 아닌 레이아웃 확인용 샘플입니다.</p></article>
+    <header className="topbar"><a className="brand" href="/" onClick={(event) => { event.preventDefault(); returnToList() }}>my little world<span>.</span></a><span className="top-note">A PERSONAL UNIVERSE</span></header>
+    <button className="back-button reader-back" onClick={returnToList}>← BACK TO {articleChapterTitle.toUpperCase()} LIST</button>
+    <article className="reader-content reader-page-content"><div className="reader-category">{article.category} <span>· {article.date}</span></div><h1>{article.title}</h1><p className="reader-subtitle">{article.subtitle}</p><div className="reader-rule" />{article.body.map((paragraph, index) => <p key={index}>{paragraph}</p>)}{article.quote && <blockquote>{article.quote}</blockquote>}<p className="reader-demo">DEMO ARTICLE · 실제 글이 아닌 레이아웃 확인용 샘플입니다.</p>
+      <nav className="article-pagination" aria-label="글 탐색">
+        <button className="page-link previous" disabled={!previousArticle} onClick={() => previousArticle && navigateToArticle(previousArticle)}><span>← PREVIOUS</span><strong>{previousArticle?.title ?? '첫 번째 글'}</strong></button>
+        <button className="article-list-link" onClick={returnToList}>목록 보기</button>
+        <button className="page-link next" disabled={!nextArticle} onClick={() => nextArticle && navigateToArticle(nextArticle)}><span>NEXT →</span><strong>{nextArticle?.title ?? '마지막 글'}</strong></button>
+      </nav>
+    </article>
     <footer className="reader-page-footer">© MY LITTLE WORLD · 2026</footer>
   </main>
 

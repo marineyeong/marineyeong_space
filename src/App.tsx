@@ -190,7 +190,7 @@ function App() {
           </div>}
           {chapter !== 'observe' && <div className="article-list"><div className="section-label">{chapter === 'connect' ? 'SELECTED WORKS & EXPERIMENTS' : 'NOTES & REFLECTIONS'} <span>02 ENTRIES</span></div>{articles[chapter].map((item, i) => <button className="article-row" key={item.id} onClick={() => navigateToArticle(item)}><span className="article-index">0{i + 1}</span><span className="article-title-wrap"><strong>{item.title}</strong><small>{item.category} · {item.date}</small></span><span className="article-arrow" aria-hidden="true">↗</span></button>)}<p className="demo-label">DEMO ARTICLES · 개인 원고 및 프로젝트 정보가 확정되면 교체됩니다.</p></div>}
         </div>
-        <footer className="panel-footer"><span>© MY LITTLE WORLD · 2026</span><span>SCROLL OVER THE UNIVERSE<br />TO CHANGE CHAPTER <b>↕</b></span></footer>
+        <footer className="panel-footer"><span>© MY LITTLE WORLD · 2026</span></footer>
       </section>
     </section>
     {isLayerOpen && <div className="layer-backdrop" onMouseDown={(e) => { if (e.target === e.currentTarget) closeSky() }}>

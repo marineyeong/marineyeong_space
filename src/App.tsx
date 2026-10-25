@@ -15,6 +15,9 @@ function App() {
   const [article, setArticle] = useState<Article | null>(null)
   const [moonOpen, setMoonOpen] = useState(false)
   const universeRef = useRef<HTMLElement>(null)
+  const chapterRef = useRef(chapter)
+  const stepRef = useRef<(direction: number) => void>(() => {})
+  const wheelState = useRef({ lastChange: 0, accumulated: 0 })
   const dialogRef = useRef<HTMLDivElement>(null)
   const returnFocus = useRef<HTMLElement | null>(null)
   const active = chapters.find((item) => item.id === chapter)!
@@ -26,27 +29,32 @@ function App() {
     const next = Math.max(0, Math.min(chapters.length - 1, index + direction))
     if (next !== index) changeChapter(chapters[next].id)
   }, [chapter, changeChapter])
+  chapterRef.current = chapter
+  stepRef.current = step
 
   useEffect(() => {
-    let lastChange = 0
-    let accumulated = 0
     const node = universeRef.current
     if (!node) return
     const onWheel = (event: WheelEvent) => {
       if (Math.abs(event.deltaY) < Math.abs(event.deltaX) || Math.abs(event.deltaY) < 18) return
+      const direction = event.deltaY > 0 ? 1 : -1
+      const index = chapters.findIndex((item) => item.id === chapterRef.current)
+      if ((direction > 0 && index === chapters.length - 1) || (direction < 0 && index === 0)) {
+        wheelState.current.accumulated = 0
+        return
+      }
       const now = Date.now()
-      if (now - lastChange < 560) { event.preventDefault(); return }
-      accumulated += event.deltaY
-      if (Math.abs(accumulated) < 80) { event.preventDefault(); return }
-      const direction = accumulated > 0 ? 1 : -1
-      const index = chapters.findIndex((item) => item.id === chapter)
-      if ((direction > 0 && index < 2) || (direction < 0 && index > 0)) {
-        event.preventDefault(); step(direction); lastChange = now; accumulated = 0
-      } else accumulated = 0
+      if (now - wheelState.current.lastChange < 560) { event.preventDefault(); return }
+      wheelState.current.accumulated += event.deltaY
+      if (Math.abs(wheelState.current.accumulated) < 80) { event.preventDefault(); return }
+      event.preventDefault()
+      stepRef.current(direction)
+      wheelState.current.lastChange = now
+      wheelState.current.accumulated = 0
     }
     node.addEventListener('wheel', onWheel, { passive: false })
     return () => node.removeEventListener('wheel', onWheel)
-  }, [chapter, step])
+  }, [])
 
   const openSky = (trigger: HTMLElement) => { returnFocus.current = trigger; setMoonOpen(true) }
   const closeSky = useCallback(() => { setMoonOpen(false); requestAnimationFrame(() => returnFocus.current?.focus()) }, [])
@@ -135,7 +143,7 @@ function App() {
         onTouchEnd={(e) => { if (!touchStart.current) return; const t = e.changedTouches[0]; const dx = t.clientX - touchStart.current.x, dy = t.clientY - touchStart.current.y; if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.3) step(dx < 0 ? 1 : -1); touchStart.current = null }}>
         <div className={`cosmos chapter-${chapter}`}>
           <div className="axis axis-one" /><div className="axis axis-two" />
-          <div className="orbit orbit-a" /><div className="orbit orbit-b" /><div className="orbit orbit-c" /><div className="orbit orbit-d" />
+          <div className="orbit orbit-a"><span className="orbit-light" aria-hidden="true" /></div><div className="orbit orbit-b" /><div className="orbit orbit-c" /><div className="orbit orbit-d" />
           <span className="starfield star-one" /><span className="starfield star-two" /><span className="starfield star-three" /><span className="starfield star-four" />
           <div className="core"><span>my</span><span>little</span><span>world.</span><i /></div>
           {chapters.map((item, index) => <button key={item.id} className={`planet planet-${index + 1} ${chapter === item.id ? 'is-active' : ''}`} onClick={() => changeChapter(item.id)} aria-label={`${item.number} ${item.title} 챕터 선택`} aria-pressed={chapter === item.id}><span className="planet-dot" /><span className="planet-label"><small>{item.number}</small> {item.title}</span></button>)}

@@ -168,10 +168,10 @@ function App() {
         onTouchEnd={(e) => { if (!touchStart.current) return; const t = e.changedTouches[0]; const dx = t.clientX - touchStart.current.x, dy = t.clientY - touchStart.current.y; if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.3) step(dx < 0 ? 1 : -1); touchStart.current = null }}>
         <div className={`cosmos chapter-${chapter}`}>
           <div className="axis axis-one" /><div className="axis axis-two" />
-          <div className="orbit orbit-a"><span className="orbit-light" aria-hidden="true" /></div><div className="orbit orbit-b" /><div className="orbit orbit-c" /><div className="orbit orbit-d" />
+          <div className="orbit orbit-a" /><div className="orbit orbit-b" /><div className="orbit orbit-c" /><div className="orbit orbit-d" />
           <span className="starfield star-one" /><span className="starfield star-two" /><span className="starfield star-three" /><span className="starfield star-four" />
           <div className="core"><span>my</span><span>little</span><span>world.</span><i /></div>
-          {chapters.map((item, index) => <button key={item.id} className={`planet planet-${index + 1} ${chapter === item.id ? 'is-active' : ''}`} onClick={() => changeChapter(item.id)} aria-label={`${item.number} ${item.title} 챕터 선택`} aria-pressed={chapter === item.id}><span className="planet-dot" /><span className="planet-label"><small>{item.number}</small> {item.title}</span></button>)}
+          {chapters.map((item, index) => <button key={item.id} className={`planet planet-${index + 1} ${chapter === item.id ? 'is-active' : ''}`} onClick={() => changeChapter(item.id)} aria-label={`${item.number} ${item.title} 챕터 선택`} aria-pressed={chapter === item.id}><span className="planet-marker"><span className="planet-dot" /><span className="planet-highlight" aria-hidden="true" /></span><span className="planet-label"><small>{item.number}</small> {item.title}</span></button>)}
           <button className="moon-button" aria-label="Tonight's sky 열기" onClick={(e) => openSky(e.currentTarget)}><span className="moon-shape" /><span className="moon-caption">TONIGHT'S SKY</span></button>
         </div>
         <span className="universe-hint">A SMALL UNIVERSE, STILL IN MOTION</span>

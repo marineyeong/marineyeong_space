@@ -2,6 +2,8 @@
 
 개인 미니홈페이지와 프론트엔드 포트폴리오의 첫 구현입니다. 승인된 명세에 따라 한 화면 안에서 Observe, Connect, Reflect를 전환합니다. 프로젝트 및 기록은 현재 교체 가능한 데모 콘텐츠입니다.
 
+[공개 사이트](https://marineyeong.github.io/marineyeong_space/)
+
 공통 폰트·타입 크기·컬러·여백·반응형 규칙은 [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md), 글 작성·업로드는 [PUBLISHING.md](./PUBLISHING.md), 작업 이력은 [WORKLOG.md](./WORKLOG.md)에서 관리합니다.
 
 ## 실행
@@ -11,7 +13,7 @@ npm install
 npm run dev
 ```
 
-프로덕션 빌드 확인은 `npm run build`, 빌드 결과 미리보기는 `npm run preview`를 사용합니다.
+프로덕션 빌드 확인은 `npm run build`, 빌드 결과 미리보기는 `npm run preview`를 사용합니다. 개발·미리보기 주소에는 Pages 경로인 `/marineyeong_space/`가 붙습니다.
 
 ## 콘텐츠 편집
 
@@ -21,7 +23,14 @@ npm run dev
 
 실제 원고는 **챕터별 Markdown 파일**로 관리합니다. 제목·분류·부제·작성일은 파일 맨 위 메타데이터에, 본문은 Markdown으로 씁니다. 빌드 과정에서 공개된 글만 불러오며 필수 정보와 날짜·이름을 검증합니다. 기존 네 편의 데모도 Markdown으로 옮겼고 원래 상세 URL을 유지합니다.
 
-원고를 대화로 전달하고 발행을 요청하면 Codex가 파일 작성·검증·커밋·push를 처리할 수 있습니다. Markdown 불러오기는 연결됐고 **배포 호스트는 아직 미정**입니다. 실제 웹 공개 자동화는 배포 호스트를 연결한 뒤 가능합니다. 글 발행 빈도가 낮아 CMS는 우선 도입하지 않고, 웹 편집이나 공동 작성 수요가 생기면 다시 검토합니다.
+원고를 대화로 전달하고 발행을 요청하면 Codex가 파일 작성·검증·커밋·push를 처리할 수 있습니다. Markdown 로더와 GitHub Pages 자동 배포를 연결했습니다. `main`에 원고를 push하면 GitHub Actions가 검증·빌드 후 웹사이트를 갱신합니다. 글 발행 빈도가 낮아 CMS는 우선 도입하지 않고, 웹 편집이나 공동 작성 수요가 생기면 다시 검토합니다.
+
+
+## 자동 배포
+
+주소는 https://marineyeong.github.io/marineyeong_space/ 입니다. `.github/workflows/deploy-pages.yml`에서 Node.js 22로 의존성 설치 → 천문 검증 → 원고·타입 검사 및 Vite 빌드 → Pages 배포를 수행합니다. 빌드에 실패하면 배포하지 않습니다. 저장소의 Pages 소스는 GitHub Actions입니다.
+
+`main`의 코드·원고 변경에 자동 실행되며 루트의 안내용 `.md` 문서만 수정한 경우에는 실행을 생략합니다. `content/articles/` 안의 Markdown 변경은 배포 대상입니다. 필요하면 Actions 화면에서 수동 실행할 수도 있습니다. 개인 도메인은 아직 연결하지 않았으며 기본 Pages 주소를 사용합니다.
 
 ## Tonight's Sky 데이터
 

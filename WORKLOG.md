@@ -39,5 +39,11 @@
 
 | 작업 | 상태 | 기록 |
 |---|---|---|
-| 실시간 천문 계산·출처·갱신 연결 | 완료 | Astronomy Engine 계산과 KASI 2026·2027 절기 우선 데이터, 실제 위상 SVG, 패널 열기·1분 간격·탭 복귀 갱신 및 오류 재시도 연결. USNO 54건·KASI 48건과 비교한 8개 테스트 통과. KST 자정·연말·보름달 이후 전환 검증. 390×844·320×568 패널 내용/내부 스크롤 확인. SKY_DATA.md에 정밀도와 출처 기록 |
-| GitHub Pages 자동 배포와 공개 URL 확인 | 구성 완료·첫 배포 검증 대기 | 관리자 권한으로 Pages를 workflow 방식으로 생성하고 HTTPS 기본 주소 확인. `/marineyeong_space/` 빌드 경로에서 실제 글 URL·천문 지연 로딩·오류 없음 검증. Actions에 Node 22 설치·천문 테스트·빌드·성공 시 배포 구성. 첫 원격 실행과 공개 URL은 push 후 확인 |
+| 실시간 천문 계산·출처·갱신 연결 | 완료 | Astronomy Engine 계산과 KASI 2026·2027 절기 우선 데이터, 실제 위상 SVG, 패널 열기·1분 간격·탭 복귀 갱신 및 오류 재시도 연결. USNO 54건·KASI 48건과 비교한 8개 테스트 통과. KST 자정·연말·보름달 이후 전환 검증. 390×844·320×568 패널 내용/내부 스크롤 확인. 공개 패널 기준 시각이 22:37→22:38 KST로 자동 갱신되는 것을 확인. SKY_DATA.md에 정밀도와 출처 기록 |
+| GitHub Pages 자동 배포와 공개 URL 확인 | 완료 | 관리자 권한으로 Pages를 workflow 방식으로 생성. `/marineyeong_space/` 경로와 HTTPS 공개 주소 연결. Node 22 설치·천문 테스트·빌드·성공 시 배포 워크플로 적용. 첫 Actions 실행 40331828503의 build·deploy 모두 성공(배포 코드 2100ba9). 공개 홈페이지, 글 상세 직접 접근·새로고침·목록 복귀, 실제 천문 모듈·출처 링크 표시와 콘솔 오류 없음 확인 |
+
+공개 주소: https://marineyeong.github.io/marineyeong_space/
+
+첫 배포 검증: https://github.com/marineyeong/marineyeong_space/actions/runs/40331828503
+
+추가 계정 설정이나 API 키 발급은 필요하지 않았습니다. 사용자에게 남은 준비는 실제 원고·프로젝트 정보·Observe 기록 제공이며, 개인 도메인은 선택 사항입니다.

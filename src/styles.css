@@ -840,20 +840,13 @@ button {
 .large-moon {
   width:64px;
   height:64px;
-  box-shadow:0 0 35px #e0d8c438;
-  background:radial-gradient(circle at 32% 35%,#a4a29455 0 5%,transparent 6%),radial-gradient(circle at 66% 62%,#858c8177 0 8%,transparent 9%),radial-gradient(circle at 40% 70%,#aaa99b55 0 4%,transparent 5%),radial-gradient(circle at 35% 30%,#f4f0e4,#c9c6b8 68%,#899184);
+
+  background:none;
+  box-shadow:none;
+  overflow:visible;
+  filter:drop-shadow(0 0 12px #e0d8c42b);
 }
-.large-moon:after {
-  content:'';
-  position:absolute;
-  background:linear-gradient(90deg,transparent 80%,#1a221d8c);
-  width:auto;
-  height:auto;
-  left:0;
-  top:0;
-  border-radius:50%;
-  inset:0;
-}
+
 .moon-card strong {
   font-size:15px;
   font-weight:500;
@@ -1293,16 +1286,13 @@ button {
   .large-moon {
     width:53px;
     height:53px;
-    background:radial-gradient(circle at 32% 35%,#a4a29455 0 5%,transparent 6%),radial-gradient(circle at 66% 62%,#858c8177 0 8%,transparent 9%),radial-gradient(circle at 40% 70%,#aaa99b55 0 4%,transparent 5%),radial-gradient(circle at 35% 30%,#f4f0e4,#c9c6b8 68%,#899184);
+
+    background:none;
+    box-shadow:none;
+    overflow:visible;
+    filter:drop-shadow(0 0 12px #e0d8c42b);
   }
-  .large-moon:after {
-    width:auto;
-    height:auto;
-    left:0;
-    top:0;
-    inset:0;
-    background:linear-gradient(90deg,transparent 80%,#1a221d8c);
-  }
+
   .sky-footnote {
     flex-direction:column;
     gap:var(--space-8);
@@ -1419,16 +1409,13 @@ button {
   .large-moon {
     width:42px;
     height:42px;
-    background:radial-gradient(circle at 32% 35%,#a4a29455 0 5%,transparent 6%),radial-gradient(circle at 66% 62%,#858c8177 0 8%,transparent 9%),radial-gradient(circle at 40% 70%,#aaa99b55 0 4%,transparent 5%),radial-gradient(circle at 35% 30%,#f4f0e4,#c9c6b8 68%,#899184);
+
+    background:none;
+    box-shadow:none;
+    overflow:visible;
+    filter:drop-shadow(0 0 12px #e0d8c42b);
   }
-  .large-moon:after {
-    width:auto;
-    height:auto;
-    left:0;
-    top:0;
-    inset:0;
-    background:linear-gradient(90deg,transparent 80%,#1a221d8c);
-  }
+
   .moon-card {
     gap:8px;
   }
@@ -1627,6 +1614,11 @@ button {
   .large-moon {
     width:42px;
     height:42px;
+
+    background:none;
+    box-shadow:none;
+    overflow:visible;
+    filter:drop-shadow(0 0 12px #e0d8c42b);
   }
 }
 @media(max-height:520px) and (max-width:700px) {
@@ -1650,3 +1642,10 @@ button {
     font-size:12px;
   }
 }
+
+.sky-footnote a { color:var(--gold); text-decoration:none; text-underline-offset:3px; }
+.sky-footnote a:hover { text-decoration:underline; }
+.sky-footnote a:focus-visible { outline:1px solid var(--gold); outline-offset:3px; }
+.sky-status { min-height:260px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:var(--space-16); text-align:center; font-size:var(--text-base); line-height:1.8; }
+.sky-retry { min-height:44px; padding:8px 16px; border:1px solid var(--line); border-radius:12px; background:var(--surface); color:var(--body); cursor:pointer; }
+.sky-retry:focus-visible { outline:1px solid var(--gold); outline-offset:3px; }

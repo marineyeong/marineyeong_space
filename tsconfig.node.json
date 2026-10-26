@@ -9,7 +9,8 @@
     "strict": true,
     "noEmit": true,
     "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
     "verbatimModuleSyntax": true
   },
-  "include": ["vite.config.ts", "scripts/**/*.ts", "src/types/content.ts"]
+  "include": ["vite.config.ts", "scripts/**/*.ts", "tests/**/*.ts", "src/types/content.ts"]
 }

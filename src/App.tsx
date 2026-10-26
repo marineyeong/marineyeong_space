@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { articles, findArticleById, observations, type Article, type Chapter } from './content'
-import { DEMO_SKY } from './sky'
+import SkyPanel from './components/SkyPanel'
 import SiteHeader from './components/SiteHeader'
 import ArticleBody from './components/ArticleBody'
 
@@ -192,15 +192,7 @@ function App() {
     </section>
     {isLayerOpen && <div className="layer-backdrop" onMouseDown={(e) => { if (e.target === e.currentTarget) closeSky() }}>
       <div className="dialog sky-dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title" ref={dialogRef}>
-        {moonOpen && <><div className="dialog-top"><div><span className="dialog-kicker">A NOTE FROM THE SKY</span><h2 id="dialog-title">Tonight's sky<span>.</span></h2></div><button className="close-button" onClick={closeSky} aria-label="하늘 패널 닫기">×</button></div>
-          <div className="sky-date">{DEMO_SKY.date} <span>{DEMO_SKY.location}</span></div>
-          <div className="sky-grid"><div className="sky-card moon-card"><span className="sky-label">MOON TONIGHT · DEMO</span><div className="large-moon" /><strong>{DEMO_SKY.moonPhase}</strong><span className="sky-value">조명률 {DEMO_SKY.illumination}</span></div>
-            <div className="sky-card"><span className="sky-label">NEXT FULL MOON</span><strong className="sky-value">{DEMO_SKY.nextFullMoonDate} <small>{DEMO_SKY.nextFullMoonYear}</small></strong><span>{DEMO_SKY.nextFullMoonTime}</span></div>
-            <div className="sky-card"><span className="sky-label">SUN SIGN</span><strong className="sky-value">{DEMO_SKY.sunSign}</strong><span>태양의 황도 별자리</span></div>
-            <div className="sky-card"><span className="sky-label">CURRENT SOLAR TERM</span><strong className="sky-value">{DEMO_SKY.currentSolarTerm}</strong><span>{DEMO_SKY.currentSolarTermDate}</span></div>
-            <div className="sky-card"><span className="sky-label">NEXT SOLAR TERM</span><strong className="sky-value">{DEMO_SKY.nextSolarTerm}</strong><span>{DEMO_SKY.nextSolarTermDate}</span></div></div>
-          <div className="sky-footnote">DEMO DATA · {DEMO_SKY.date} <span>천문 데이터 자동 갱신 연동 전의 시안 값입니다.</span></div>
-        </>}
+        <SkyPanel onClose={closeSky} />
       </div>
     </div>}
   </main>

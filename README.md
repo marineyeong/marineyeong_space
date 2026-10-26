@@ -2,7 +2,7 @@
 
 개인 미니홈페이지와 프론트엔드 포트폴리오의 첫 구현입니다. 승인된 명세에 따라 한 화면 안에서 Observe, Connect, Reflect를 전환합니다. 프로젝트 및 기록은 현재 교체 가능한 데모 콘텐츠입니다.
 
-공통 폰트·타입 크기·컬러·여백·반응형 규칙은 [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md), 작업 이력은 [WORKLOG.md](./WORKLOG.md)에서 관리합니다.
+공통 폰트·타입 크기·컬러·여백·반응형 규칙은 [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md), 글 작성·업로드는 [PUBLISHING.md](./PUBLISHING.md), 작업 이력은 [WORKLOG.md](./WORKLOG.md)에서 관리합니다.
 
 ## 실행
 
@@ -15,13 +15,13 @@ npm run dev
 
 ## 콘텐츠 편집
 
-- Observe 기록과 현재 데모 글은 `src/content.ts`에 있습니다. 글 상세는 에디토리얼 뷰어에서 읽힙니다.
+- Observe 기록은 `src/content.ts`, Connect·Reflect 원고는 `content/articles/<chapter>/<slug>.md`에 있습니다. 글 상세는 에디토리얼 뷰어에서 읽힙니다.
 - Connect / Reflect 글은 `?article=<id>` 주소로 별도 읽기 화면을 엽니다. 챕터 목록으로 돌아가거나 이전·다음 글을 이어 읽을 수 있고, 브라우저 뒤로 가기도 지원합니다.
 - 모든 초기 글은 인터페이스에서 데모임을 표시하며 실제 경력이나 경험을 주장하지 않습니다.
 
-실제 원고는 **챕터별 Markdown 파일**로 관리하는 방향을 정했습니다. 예를 들면 `content/articles/connect/<slug>.md` 또는 `content/articles/reflect/<slug>.md`에 글 한 편씩 두고, 제목·분류·부제·작성일은 파일 맨 위 메타데이터에, 본문은 Markdown으로 씁니다. 원고를 추가·수정한 뒤 Git에 커밋하고 push하면, 연결한 정적 배포가 빌드해 상세 페이지를 갱신하는 흐름이 목표입니다.
+실제 원고는 **챕터별 Markdown 파일**로 관리합니다. 제목·분류·부제·작성일은 파일 맨 위 메타데이터에, 본문은 Markdown으로 씁니다. 빌드 과정에서 공개된 글만 불러오며 필수 정보와 날짜·이름을 검증합니다. 기존 네 편의 데모도 Markdown으로 옮겼고 원래 상세 URL을 유지합니다.
 
-현재 앱은 아직 TypeScript 데모 배열을 사용하며 Markdown 불러오기와 배포 호스트는 연결되지 않았습니다. 첫 실제 원고를 넣을 때 Markdown 로더를 붙이고, 그때 배포 대상을 정하면 됩니다. 글 발행 빈도가 낮아 CMS는 우선 도입하지 않고, 웹 편집이나 공동 작성 수요가 생기면 다시 검토합니다.
+원고를 대화로 전달하고 발행을 요청하면 Codex가 파일 작성·검증·커밋·push를 처리할 수 있습니다. Markdown 불러오기는 연결됐고 **배포 호스트는 아직 미정**입니다. 실제 웹 공개 자동화는 배포 호스트를 연결한 뒤 가능합니다. 글 발행 빈도가 낮아 CMS는 우선 도입하지 않고, 웹 편집이나 공동 작성 수요가 생기면 다시 검토합니다.
 
 ## Tonight's Sky 데이터
 

@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { articles, observations, type Article, type Chapter } from './content'
+import { articles, findArticleById, observations, type Article, type Chapter } from './content'
 import { DEMO_SKY } from './sky'
 import SiteHeader from './components/SiteHeader'
+import ArticleBody from './components/ArticleBody'
 
 const chapters: { id: Chapter; number: string; title: string; prompt: string; description: string }[] = [
   { id: 'observe', number: '01', title: 'Observe', prompt: 'What do you notice?', description: '익숙한 것들을 천천히 바라보며 작은 발견을 모읍니다.' },
@@ -23,7 +24,7 @@ function App() {
   const returnFocus = useRef<HTMLElement | null>(null)
   const active = chapters.find((item) => item.id === chapter)!
   const observation = observations.find((item) => item.id === selected)
-  const articleChapter = article ? chapters.find((item) => item.id !== 'observe' && articles[item.id].some((entry) => entry.id === article.id)) ?? null : null
+  const articleChapter = article ? chapters.find((item) => item.id === article.chapter) ?? null : null
   const articleEntries = articleChapter ? articles[articleChapter.id as 'connect' | 'reflect'] : []
   const articleIndex = article ? articleEntries.findIndex((entry) => entry.id === article.id) : -1
   const previousArticle = articleIndex > 0 ? articleEntries[articleIndex - 1] : null
@@ -68,8 +69,7 @@ function App() {
   const openSky = (trigger: HTMLElement) => { returnFocus.current = trigger; setMoonOpen(true) }
   const closeSky = useCallback(() => { setMoonOpen(false); requestAnimationFrame(() => returnFocus.current?.focus()) }, [])
   const navigateToArticle = (entry: Article) => {
-    const parent = chapters.find((item) => item.id !== 'observe' && articles[item.id].some((candidate) => candidate.id === entry.id))
-    if (parent) setChapter(parent.id)
+    setChapter(entry.chapter)
     setArticle(entry)
     window.history.pushState({ articleId: entry.id }, '', `?article=${encodeURIComponent(entry.id)}`)
     window.scrollTo(0, 0)
@@ -83,26 +83,23 @@ function App() {
   }, [articleChapter, chapter])
   const isLayerOpen = moonOpen
   useEffect(() => {
-    const findArticle = (id: string | null) => id ? Object.values(articles).flat().find((item) => item.id === id) ?? null : null
     const initialId = new URLSearchParams(window.location.search).get('article')
-    const initialArticle = findArticle(initialId)
+    const initialArticle = findArticleById(initialId)
     if (initialArticle) {
       window.history.replaceState({ articleId: null }, '', window.location.pathname)
       window.history.pushState({ articleId: initialArticle.id }, '', `?article=${encodeURIComponent(initialArticle.id)}`)
       setArticle(initialArticle)
-      const parent = chapters.find((item) => item.id !== 'observe' && articles[item.id].some((entry) => entry.id === initialArticle.id))
-      if (parent) setChapter(parent.id)
+      setChapter(initialArticle.chapter)
     } else {
       const initialChapter = new URLSearchParams(window.location.search).get('chapter')
       if (initialChapter === 'connect' || initialChapter === 'reflect') setChapter(initialChapter)
     }
     const onPopState = () => {
       const params = new URLSearchParams(window.location.search)
-      const next = findArticle(params.get('article'))
+      const next = findArticleById(params.get('article'))
       setArticle(next)
       if (next) {
-        const parent = chapters.find((item) => item.id !== 'observe' && articles[item.id].some((entry) => entry.id === next.id))
-        if (parent) setChapter(parent.id)
+        setChapter(next.chapter)
       } else {
         const targetChapter = params.get('chapter')
         if (targetChapter === 'connect' || targetChapter === 'reflect') setChapter(targetChapter)
@@ -144,7 +141,7 @@ function App() {
   if (article) return <main className="site-shell reader-page">
     <SiteHeader onHome={returnToList} />
     <button className="back-button reader-back" onClick={returnToList}>← BACK TO {articleChapterTitle.toUpperCase()} LIST</button>
-    <article className="reader-content reader-page-content"><div className="reader-category">{article.category} <span>· {article.date}</span></div><h1>{article.title}</h1><p className="reader-subtitle">{article.subtitle}</p><div className="reader-rule" />{article.body.map((paragraph, index) => <p key={index}>{paragraph}</p>)}{article.quote && <blockquote>{article.quote}</blockquote>}<p className="reader-demo">DEMO ARTICLE · 실제 글이 아닌 레이아웃 확인용 샘플입니다.</p>
+    <article className="reader-content reader-page-content">{!article.published && <p className="draft-note">LOCAL DRAFT PREVIEW · 아직 발행하지 않은 초안입니다.</p>}<div className="reader-category">{article.category} <span>· {article.demo ? 'DEMO ARTICLE · ' : ''}{article.date}</span></div><h1>{article.title}</h1><p className="reader-subtitle">{article.subtitle}</p><div className="reader-rule" /><ArticleBody source={article.body} />{article.demo && <p className="reader-demo">DEMO ARTICLE · 실제 글이 아닌 레이아웃 확인용 샘플입니다.</p>}
       <nav className="article-pagination" aria-label="글 탐색">
         <button className="page-link previous" disabled={!previousArticle} onClick={() => previousArticle && navigateToArticle(previousArticle)}><span>← PREVIOUS</span><strong>{previousArticle?.title ?? '첫 번째 글'}</strong></button>
         <button className="article-list-link" onClick={returnToList}>목록 보기</button>
@@ -188,7 +185,7 @@ function App() {
             {discovered.size === 4 && <p className="complete-note" role="status">ALL FOUR STARS FOUND · CONSTELLATION COMPLETE</p>}
             <p className="demo-label">SAMPLE CONTENT · 실제 기록으로 교체할 수 있습니다.</p>
           </div>}
-          {chapter !== 'observe' && <div className="article-list"><div className="section-label">{chapter === 'connect' ? 'SELECTED WORKS & EXPERIMENTS' : 'NOTES & REFLECTIONS'} <span>02 ENTRIES</span></div>{articles[chapter].map((item, i) => <button className="article-row" key={item.id} onClick={() => navigateToArticle(item)}><span className="article-index">0{i + 1}</span><span className="article-title-wrap"><strong>{item.title}</strong><small>{item.category} · {item.date}</small></span><span className="article-arrow" aria-hidden="true">↗</span></button>)}<p className="demo-label">DEMO ARTICLES · 개인 원고 및 프로젝트 정보가 확정되면 교체됩니다.</p></div>}
+          {chapter !== 'observe' && <div className="article-list"><div className="section-label">{chapter === 'connect' ? 'SELECTED WORKS & EXPERIMENTS' : 'NOTES & REFLECTIONS'} <span>{String(articles[chapter].length).padStart(2, '0')} ENTRIES</span></div>{articles[chapter].map((item, i) => <button className="article-row" key={item.id} onClick={() => navigateToArticle(item)}><span className="article-index">{String(i + 1).padStart(2, '0')}</span><span className="article-title-wrap"><strong>{item.title}</strong><small>{item.category} · {item.demo ? 'DEMO ARTICLE · ' : ''}{item.date}</small></span><span className="article-arrow" aria-hidden="true">↗</span></button>)}{articles[chapter].length === 0 && <p className="empty-note">아직 공개된 글이 없습니다.</p>}{articles[chapter].some((item) => item.demo) && <p className="demo-label">DEMO ARTICLES · 개인 원고 및 프로젝트 정보가 확정되면 교체됩니다.</p>}</div>}
         </div>
         <footer className="panel-footer"><span>© MY LITTLE WORLD · 2026</span></footer>
       </section>

@@ -2,6 +2,8 @@
 
 개인 미니홈페이지와 프론트엔드 포트폴리오의 첫 구현입니다. 승인된 명세에 따라 한 화면 안에서 Observe, Connect, Reflect를 전환합니다. 프로젝트 및 기록은 현재 교체 가능한 데모 콘텐츠입니다.
 
+공통 폰트·타입 크기·컬러·여백·반응형 규칙은 [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md), 작업 이력은 [WORKLOG.md](./WORKLOG.md)에서 관리합니다.
+
 ## 실행
 
 ```sh

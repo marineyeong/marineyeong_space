@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { articles, observations, type Article, type Chapter } from './content'
 import { DEMO_SKY } from './sky'
+import SiteHeader from './components/SiteHeader'
 
 const chapters: { id: Chapter; number: string; title: string; prompt: string; description: string }[] = [
   { id: 'observe', number: '01', title: 'Observe', prompt: 'What do you notice?', description: '익숙한 것들을 천천히 바라보며 작은 발견을 모읍니다.' },
@@ -40,8 +41,10 @@ function App() {
 
   useEffect(() => {
     const node = universeRef.current
-    if (!node) return
+    if (!node || article) return
+    const desktopWheel = window.matchMedia('(min-width: 701px) and (hover: hover) and (pointer: fine)')
     const onWheel = (event: WheelEvent) => {
+      if (!desktopWheel.matches || event.ctrlKey || event.deltaY === 0) return
       if (Math.abs(event.deltaY) < Math.abs(event.deltaX) || Math.abs(event.deltaY) < 18) return
       const direction = event.deltaY > 0 ? 1 : -1
       const index = chapters.findIndex((item) => item.id === chapterRef.current)
@@ -60,7 +63,7 @@ function App() {
     }
     node.addEventListener('wheel', onWheel, { passive: false })
     return () => node.removeEventListener('wheel', onWheel)
-  }, [])
+  }, [article])
 
   const openSky = (trigger: HTMLElement) => { returnFocus.current = trigger; setMoonOpen(true) }
   const closeSky = useCallback(() => { setMoonOpen(false); requestAnimationFrame(() => returnFocus.current?.focus()) }, [])
@@ -132,15 +135,14 @@ function App() {
     return () => { document.removeEventListener('keydown', onKey); if (previous && !returnFocus.current) previous.focus() }
   }, [isLayerOpen, closeSky])
 
-  const touchStart = useRef<{ x: number; y: number } | null>(null)
   const markDiscovered = (id: string) => setDiscovered((old) => new Set(old).add(id))
 
   useEffect(() => {
     document.title = article ? `${article.title} · my little world.` : "my little world."
   }, [article])
 
-  if (article) return <main className="reader-page">
-    <header className="topbar"><a className="brand" href="/" onClick={(event) => { event.preventDefault(); returnToList() }}>my little world<span>.</span></a><span className="top-note">A PERSONAL UNIVERSE</span></header>
+  if (article) return <main className="site-shell reader-page">
+    <SiteHeader onHome={returnToList} />
     <button className="back-button reader-back" onClick={returnToList}>← BACK TO {articleChapterTitle.toUpperCase()} LIST</button>
     <article className="reader-content reader-page-content"><div className="reader-category">{article.category} <span>· {article.date}</span></div><h1>{article.title}</h1><p className="reader-subtitle">{article.subtitle}</p><div className="reader-rule" />{article.body.map((paragraph, index) => <p key={index}>{paragraph}</p>)}{article.quote && <blockquote>{article.quote}</blockquote>}<p className="reader-demo">DEMO ARTICLE · 실제 글이 아닌 레이아웃 확인용 샘플입니다.</p>
       <nav className="article-pagination" aria-label="글 탐색">
@@ -152,8 +154,8 @@ function App() {
     <footer className="reader-page-footer">© MY LITTLE WORLD · 2026</footer>
   </main>
 
-  return <main className="page-shell">
-    <header className="topbar"><a className="brand" href="#top" onClick={(event) => { event.preventDefault(); setChapter('observe'); setSelected(null) }}>my little world<span>.</span></a><span className="top-note">A PERSONAL UNIVERSE</span></header>
+  return <main className="site-shell page-shell">
+    <SiteHeader onHome={() => { setChapter('observe'); setSelected(null); window.scrollTo(0, 0) }} />
     <section className="layout" id="top">
       <section className="intro" aria-labelledby="intro-title">
         <div className="eyebrow"><i /> AN ONGOING COLLECTION / 001</div>
@@ -162,10 +164,8 @@ function App() {
         <div className="intro-foot"><span>NOTICING · MAKING · REFLECTING</span><span>SEOUL, KR</span></div>
       </section>
 
-      <section className="universe" ref={universeRef} tabIndex={0} aria-label="우주 탐색 영역. 방향키 또는 스크롤로 챕터를 바꿀 수 있습니다."
-        onKeyDown={(e) => { if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { e.preventDefault(); step(1) } if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); step(-1) } }}
-        onTouchStart={(e) => { const t = e.touches[0]; touchStart.current = { x: t.clientX, y: t.clientY } }}
-        onTouchEnd={(e) => { if (!touchStart.current) return; const t = e.changedTouches[0]; const dx = t.clientX - touchStart.current.x, dy = t.clientY - touchStart.current.y; if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.3) step(dx < 0 ? 1 : -1); touchStart.current = null }}>
+      <section className="universe" ref={universeRef} tabIndex={0} aria-label="우주 탐색. 행성이나 챕터 버튼으로 선택하세요. PC에서는 휠과 방향키로도 전환할 수 있습니다."
+        onKeyDown={(e) => { if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { e.preventDefault(); step(1) } if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); step(-1) } }}>
         <div className={`cosmos chapter-${chapter}`}>
           <div className="axis axis-one" /><div className="axis axis-two" />
           <div className="orbit orbit-a" /><div className="orbit orbit-b" /><div className="orbit orbit-c" /><div className="orbit orbit-d" />
@@ -194,7 +194,7 @@ function App() {
       </section>
     </section>
     {isLayerOpen && <div className="layer-backdrop" onMouseDown={(e) => { if (e.target === e.currentTarget) closeSky() }}>
-      <div className={`dialog ${moonOpen ? 'sky-dialog' : 'reader-dialog'}`} role="dialog" aria-modal="true" aria-labelledby="dialog-title" ref={dialogRef}>
+      <div className="dialog sky-dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title" ref={dialogRef}>
         {moonOpen && <><div className="dialog-top"><div><span className="dialog-kicker">A NOTE FROM THE SKY</span><h2 id="dialog-title">Tonight's sky<span>.</span></h2></div><button className="close-button" onClick={closeSky} aria-label="하늘 패널 닫기">×</button></div>
           <div className="sky-date">{DEMO_SKY.date} <span>{DEMO_SKY.location}</span></div>
           <div className="sky-grid"><div className="sky-card moon-card"><span className="sky-label">MOON TONIGHT · DEMO</span><div className="large-moon" /><strong>{DEMO_SKY.moonPhase}</strong><span className="sky-value">조명률 {DEMO_SKY.illumination}</span></div>
